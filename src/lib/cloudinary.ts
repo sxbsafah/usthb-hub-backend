@@ -1,0 +1,33 @@
+import config from "@/config";
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
+
+
+cloudinary.config({
+  cloud_name: config.CLOUDINARY_CLOUD_NAME,
+  api_key: config.CLOUDINARY_API_KEY,
+  api_secret: config.CLOUDINARY_API_SECRET,
+  secure: config.NODE_ENV === "production",
+
+});
+
+
+const uploadToCloudinary = async (buffer: Buffer<ArrayBufferLike>, publicId?: string): Promise<UploadApiResponse | undefined> => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream({
+      allowed_formats: ["jpg", "jpeg", "png", "pdf"],
+      resource_type: "image",
+      folder: "usthb-hub",
+      public_id: publicId,
+      transformation: [{ quality: "auto" }],
+
+    }, (err, result) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(result)
+    }).end(buffer)
+  })
+}
+
+export default uploadToCloudinary;
+

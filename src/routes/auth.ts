@@ -44,6 +44,6 @@ router.post(
   login
 );
 
-router.get("/logout", authenticate, logout);
+router.get("/logout", authenticate("user"), logout);
 
 export default router;
