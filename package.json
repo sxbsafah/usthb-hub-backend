@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && node dist/server.js",
-    "build": "npm install && tsc"
+    "build": "npm install && tsc && tsc-alias"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +33,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.0.0",
     "multer": "^2.0.2",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.9.3",
     "zod": "^4.1.13"
   }
