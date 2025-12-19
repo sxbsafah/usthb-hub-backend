@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import User from "@/models/user";
 import { generateToken } from "@/lib/jwt";
 import Token from "@/models/token";
-import { comparePassword }  from "@/lib/hash";
+import { comparePassword } from "@/lib/hash";
 
 type LoginData = Pick<IUser, "username" | "email" | "password">;
 
@@ -17,10 +17,7 @@ const login = async (request: Request, response: Response) => {
       });
     }
     const user = await User.findOne({
-      $or: [
-        { username },
-        { email },
-      ],
+      $or: [{ username }, { email }],
     });
     if (!user || !(await comparePassword(password, user.password))) {
       return response.status(400).json({
@@ -38,14 +35,14 @@ const login = async (request: Request, response: Response) => {
     });
     return response.status(200).json({
       message: "Login successful",
-      token: token.token,
       user: {
+        token: token.token,
         username: user.username,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-      }
+      },
     });
   } catch (err) {
     return response.status(500).json({
