@@ -4,7 +4,6 @@ import type { Request, Response } from "express";
 import Token from "@/models/token";
 import { generateToken } from "@/lib/jwt";
 
-
 type UserData = Pick<
   IUser,
   "username" | "email" | "password" | "firstName" | "lastName"
@@ -27,13 +26,13 @@ const register = async (request: Request, response: Response) => {
     });
     return response.status(201).json({
       message: "User registered successfully",
-      token: token.token,
       user: {
         username: user.username,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        token: token.token,
       },
     });
   } catch (err) {
