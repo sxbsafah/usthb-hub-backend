@@ -1,6 +1,9 @@
 import { hashPassword } from "@/lib/hash";
 import User, { type IUser } from "@/models/user";
 import type { Request, Response } from "express";
+import Token from "@/models/token";
+import { generateToken } from "@/lib/jwt";
+
 
 type UserData = Pick<
   IUser,
@@ -18,13 +21,19 @@ const register = async (request: Request, response: Response) => {
       firstName,
       lastName,
     });
+    const token = await Token.create({
+      userId: user._id,
+      token: generateToken(user._id),
+    });
     return response.status(201).json({
       message: "User registered successfully",
+      token: token.token,
       user: {
         username: user.username,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
       },
     });
   } catch (err) {
