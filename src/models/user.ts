@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 export interface IUser {
-  username: string;
   email: string;
   password: string;
   role: "admin" | "user";
@@ -16,13 +15,6 @@ export interface IUser {
 
 const userSchema = new mongoose.Schema<IUser>(
   {
-    username: {
-      type: mongoose.Schema.Types.String,
-      required: [true, "Username is required"],
-      maxLength: [20, "Username must be at most 20 characters long"],
-      minLength: [3, "Username must be at least 3 characters long"],
-      unique: [true, "Username must be unique"],
-    },
     email: {
       type: mongoose.Schema.Types.String,
       required: [true, "Email is required"],

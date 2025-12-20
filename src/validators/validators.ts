@@ -6,18 +6,7 @@ import SubModule from "@/models/subModule";
 import Contribution from "@/models/contribution";
 import Resource from "@/models/resource";
 
-export const usernameValidator = body("username")
-  .isString()
-  .notEmpty()
-  .withMessage("Username is Required")
-  .isLength({ min: 3, max: 20 })
-  .withMessage("Username must be between 3 and 20 characters")
-  .custom(async (value: string) => {
-    const existingUser = await User.findOne({ username: value });
-    if (existingUser) {
-      throw new Error("Username is already in use");
-    }
-  });
+
 
 export const emailValidator = body("email")
   .isString()
@@ -65,11 +54,6 @@ export const loginEmailValidator = body("email")
   .isEmail()
   .withMessage("Invalid email address");
 
-export const loginUsernameValidator = body("username")
-  .optional()
-  .isString()
-  .notEmpty()
-  .withMessage("Username is Required");
 
 export const loginPasswordValidator = body("password")
   .isString()

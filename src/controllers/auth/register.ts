@@ -6,15 +6,14 @@ import { generateToken } from "@/lib/jwt";
 
 type UserData = Pick<
   IUser,
-  "username" | "email" | "password" | "firstName" | "lastName"
+  "email" | "password" | "firstName" | "lastName"
 >;
 
 const register = async (request: Request, response: Response) => {
   try {
-    const { username, email, password, firstName, lastName } =
+    const { email, password, firstName, lastName } =
       request.body as UserData;
     const user = await User.create({
-      username,
       password: await hashPassword(password),
       email,
       firstName,
@@ -27,7 +26,6 @@ const register = async (request: Request, response: Response) => {
     return response.status(201).json({
       message: "User registered successfully",
       user: {
-        username: user.username,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,

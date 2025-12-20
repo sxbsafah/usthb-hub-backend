@@ -5,19 +5,19 @@ import { generateToken } from "@/lib/jwt";
 import Token from "@/models/token";
 import { comparePassword } from "@/lib/hash";
 
-type LoginData = Pick<IUser, "username" | "email" | "password">;
+type LoginData = Pick<IUser,  "email" | "password">;
 
 const login = async (request: Request, response: Response) => {
   try {
-    const { username, email, password } = request.body as LoginData;
-    if (!username && !email) {
+    const {  email, password } = request.body as LoginData;
+    if (!email) {
       return response.status(400).json({
         code: "ValidationError",
-        message: "Either username or email is required",
+        message: "Email is required",
       });
     }
     const user = await User.findOne({
-      $or: [{ username }, { email }],
+      $or: [{ email }],
     });
     if (!user || !(await comparePassword(password, user.password))) {
       return response.status(400).json({
