@@ -31,7 +31,6 @@ const getResourcesByUserId = async (request: Request, response: Response) => {
       message: "Resources retrieved successfully",
       user: {
         id: user._id,
-        username: user.username,
         email: user.email,
       },
       resources: userResources,

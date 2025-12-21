@@ -20,7 +20,7 @@ const getPendingContributions = async (
       if (!contributionsMap.has(contributionId)) {
         const fullContribution = await Contribution.findById(
           contributionId
-        ).populate("userId", "username email");
+        ).populate("userId", "email");
         contributionsMap.set(contributionId, {
           contribution: fullContribution,
           resources: [],

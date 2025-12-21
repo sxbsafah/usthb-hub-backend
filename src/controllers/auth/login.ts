@@ -5,11 +5,11 @@ import { generateToken } from "@/lib/jwt";
 import Token from "@/models/token";
 import { comparePassword } from "@/lib/hash";
 
-type LoginData = Pick<IUser,  "email" | "password">;
+type LoginData = Pick<IUser, "email" | "password">;
 
 const login = async (request: Request, response: Response) => {
   try {
-    const {  email, password } = request.body as LoginData;
+    const { email, password } = request.body as LoginData;
     if (!email) {
       return response.status(400).json({
         code: "ValidationError",
@@ -22,7 +22,7 @@ const login = async (request: Request, response: Response) => {
     if (!user || !(await comparePassword(password, user.password))) {
       return response.status(400).json({
         code: "AuthenticationError",
-        message: "Invalid username/email or password",
+        message: "Invalid email or password",
       });
     }
     let token = await Token.findOne({ userId: user._id });

@@ -2,14 +2,12 @@ import { Router } from "express";
 import register from "@/controllers/auth/register";
 import validateRequest from "@/middlewares/validateRequest";
 import {
-  usernameValidator,
   emailValidator,
   firstNameValidator,
   lastNameValidator,
   passwordValidator,
   loginEmailValidator,
   loginPasswordValidator,
-  loginUsernameValidator,
 } from "@/validators/validators";
 import login from "@/controllers/auth/login";
 import authenticate from "@/middlewares/authenticate";
@@ -26,7 +24,6 @@ router.get("/", (req, res) => {
 
 router.post(
   "/register",
-  usernameValidator,
   emailValidator,
   firstNameValidator,
   lastNameValidator,
@@ -39,7 +36,6 @@ router.post(
   "/login",
   loginEmailValidator,
   loginPasswordValidator,
-  loginUsernameValidator,
   validateRequest,
   login
 );
