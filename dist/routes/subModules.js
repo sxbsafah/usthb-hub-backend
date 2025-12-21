@@ -1,0 +1,23 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const createSubModule_1 = __importDefault(require("../controllers/createSubModule"));
+const getSubModules_1 = __importDefault(require("../controllers/getSubModules"));
+const getSubModuleById_1 = __importDefault(require("../controllers/getSubModuleById"));
+const getSubModulesByModuleId_1 = __importDefault(require("../controllers/getSubModulesByModuleId"));
+const updateSubModule_1 = __importDefault(require("../controllers/updateSubModule"));
+const deleteSubModule_1 = __importDefault(require("../controllers/deleteSubModule"));
+const validateRequest_1 = __importDefault(require("../middlewares/validateRequest"));
+const authenticate_1 = __importDefault(require("../middlewares/authenticate"));
+const validators_1 = require("../validators/validators");
+const router = (0, express_1.Router)();
+router.get("/", getSubModules_1.default);
+router.get("/module/:moduleId", validators_1.moduleIdParamRouteValidator, validateRequest_1.default, getSubModulesByModuleId_1.default);
+router.get("/:id", validators_1.subModuleOrModuleIdValidator, validateRequest_1.default, getSubModuleById_1.default);
+router.post("/", (0, authenticate_1.default)("admin"), validators_1.subModuleNameValidator, validators_1.moduleIdValidator, validateRequest_1.default, createSubModule_1.default);
+router.put("/:id", (0, authenticate_1.default)("admin"), validators_1.subModuleOrModuleIdValidator, validateRequest_1.default, updateSubModule_1.default);
+router.delete("/:id", (0, authenticate_1.default)("admin"), validators_1.subModuleOrModuleIdValidator, validateRequest_1.default, deleteSubModule_1.default);
+exports.default = router;

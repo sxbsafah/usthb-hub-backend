@@ -38,7 +38,7 @@ const resourceSchema = new mongoose.Schema<IResource>({
   subModuleOrModuleId: {
     type: mongoose.Schema.Types.ObjectId,
     required: [true, "SubModule ID is required"],
-    ref: "subModuleOrModuleType",
+    refPath: "subModuleOrModuleType", // Dynamic reference to either 'Module' or 'SubModule'
   },
   subModuleOrModuleType: {
     type: String,

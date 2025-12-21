@@ -9,13 +9,18 @@ const getMyContributions = async (request: Request, response: Response) => {
     const contributions = await Contribution.find({ userId: userId })
       .populate("userId")
       .sort({ createdAt: -1 });
+    if (!contributions || contributions.length === 0) {
+      return response.status(200).json({
+        message: "You have no contributions yet",
+        contributions: [],
+      });
+    }
 
     const contributionsWithResources = await Promise.all(
       contributions.map(async (contribution) => {
         const resources = await Resource.find({
           contributionId: contribution._id,
         }).populate("subModuleOrModuleId", "name");
-
         return {
           ...(await contribution.populate("userId")).toObject(),
           resources: resources,
