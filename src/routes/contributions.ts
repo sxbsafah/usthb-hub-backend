@@ -85,13 +85,15 @@ router.put(
 );
 
 router.patch(
-  "/resource/:resourceId/status",
+  "/resource/:resourceId/",
   authenticate("admin"),
   resourceIdRouteValidator,
   resourceStatusValidator,
   validateRequest,
   updateResourceStatus
 );
+
+
 
 router.delete(
   "/:id",
