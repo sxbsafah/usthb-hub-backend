@@ -88,14 +88,18 @@ const uploadResources = async (
     });
   }
 
-  const metadata = JSON.parse((request.body as { metadata: string }).metadata);
-  if (!(await metadataSchema.safeParseAsync(metadata)).success) {
+  const metadataRaw = (request.body as { metadata: string }).metadata;
+  const metadata = JSON.parse(metadataRaw);
+  const validation = await metadataSchema.safeParseAsync(metadata);
+  if (!validation.success) {
     return response.status(400).json({
       code: "ValidationError",
       message: "Invalid metadata format",
-      errors: (await metadataSchema.safeParseAsync(metadata)).error?.issues,
+      errors: validation.error?.issues,
     });
   }
+  // Assign parsed metadata array to request.body for downstream use
+  request.body.metadata = metadata;
 
   if (metadata.length !== (request.files as Express.Multer.File[]).length) {
     return response.status(400).json({
