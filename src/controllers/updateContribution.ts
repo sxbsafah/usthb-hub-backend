@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import Contribution from "@/models/contribution";
 import Resource from "@/models/resource";
+import mongoose from "mongoose";
 
 type MetadataEntry = {
   subModuleOrModuleId: string;
@@ -48,7 +49,9 @@ const updateContribution = async (request: Request, response: Response) => {
         const meta = metadata[i];
         await Resource.create({
           contributionId: contribution._id,
-          subModuleOrModuleId: meta.subModuleOrModuleId,
+          subModuleOrModuleId: new mongoose.Types.ObjectId(
+            meta.subModuleOrModuleId
+          ),
           subModuleOrModuleType: meta.subModuleOrModuleType,
           resourceType: meta.resourceType,
           publicId: data.public_id,

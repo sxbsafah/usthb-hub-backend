@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import Contribution, { IContribution } from "@/models/contribution";
 import Resource, { IResource } from "@/models/resource";
+import mongoose from "mongoose";
 
 type ContributionData = Pick<IContribution, "description"> &
   Pick<
@@ -22,7 +23,9 @@ const createContribution = async (request: Request, response: Response) => {
       if (request.resources && request.resources[index]) {
         await Resource.create({
           contributionId: contribution._id,
-          subModuleOrModuleId: data.subModuleOrModuleId,
+          subModuleOrModuleId: new mongoose.Types.ObjectId(
+            data.subModuleOrModuleId
+          ),
           subModuleOrModuleType: data.subModuleOrModuleType,
           resourceType: data.resourceType,
           publicId: request.resources[index].public_id,
