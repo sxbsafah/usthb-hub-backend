@@ -50,9 +50,15 @@ const getMyContributions = async (request: Request, response: Response) => {
             } else if (
               resource.subModuleOrModuleId &&
               typeof resource.subModuleOrModuleId === "object" &&
-              resource.subModuleOrModuleId.name
+              !(
+                typeof resource.subModuleOrModuleId._bsontype === "string" &&
+                resource.subModuleOrModuleId._bsontype === "ObjectId"
+              ) &&
+              "name" in resource.subModuleOrModuleId
             ) {
-              subModuleOrModuleName = resource.subModuleOrModuleId.name;
+              // Only access .name if not a plain ObjectId
+              subModuleOrModuleName = (resource.subModuleOrModuleId as any)
+                .name;
             }
             return {
               ...resource.toObject(),
