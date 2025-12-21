@@ -45,7 +45,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 };
 
 
-export const getCurretUser = async (req: Request, res: Response) => {
+export const getCurretUser = async (req: Request, res: Response)=> {
   const { userId } = req;
   try {
     const user = await User.findById(userId);
