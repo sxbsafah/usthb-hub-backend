@@ -6,7 +6,7 @@ const getContributionById = async (req: Request, response: Response) => {
     const { id } = req.params;
 
     const contribution = await Contribution.findById(id)
-      .populate("userId", "name email")
+      .populate("userId")
       .populate("resources");
 
     if (!contribution) {

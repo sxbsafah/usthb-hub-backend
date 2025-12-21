@@ -4,7 +4,7 @@ import Contribution from "@/models/contribution";
 const getContributions = async (req: Request, response: Response) => {
   try {
     const contributions = await Contribution.find()
-      .populate("userId", "name email")
+      .populate("userId")
       .populate("resources");
 
     return response.status(200).json({

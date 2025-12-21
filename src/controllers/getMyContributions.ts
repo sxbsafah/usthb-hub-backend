@@ -7,7 +7,7 @@ const getMyContributions = async (request: Request, response: Response) => {
     const userId = request.userId;
 
     const contributions = await Contribution.find({ userId: userId })
-      .populate("userId", "name email")
+      .populate("userId")
       .sort({ createdAt: -1 });
 
     const contributionsWithResources = await Promise.all(
@@ -17,7 +17,7 @@ const getMyContributions = async (request: Request, response: Response) => {
         }).populate("subModuleId", "name");
 
         return {
-          ...contribution.toObject(),
+          ...(await contribution.populate("userId")).toObject(),
           resources: resources,
         };
       })

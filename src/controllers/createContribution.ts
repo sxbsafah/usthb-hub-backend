@@ -31,7 +31,7 @@ const createContribution = async (request: Request, response: Response) => {
     return response.status(201).json({
       code: "Success",
       message: "Contribution created successfully",
-      data: contribution,
+      data: await contribution.populate("userId"),
     });
   } catch (error) {
     return response.status(500).json({
