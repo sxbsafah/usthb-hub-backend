@@ -12,6 +12,10 @@ import { connectToDatabase, disconnectFromDatabase } from "./lib/mongoose";
 
 const app = express();
 
+
+app.set("trust proxy", 1);
+
+
 app.use(rateLimit({
   windowMs: 60000,
   limit: 60,
