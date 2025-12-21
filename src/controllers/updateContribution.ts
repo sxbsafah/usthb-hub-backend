@@ -3,7 +3,8 @@ import Contribution from "@/models/contribution";
 import Resource from "@/models/resource";
 
 type MetadataEntry = {
-  subModuleId: string;
+  subModuleOrModuleId: string;
+  subModuleOrModuleType: "SubModule" | "Module";
   resourceType: "td" | "tp" | "exam" | "course_material";
 };
 
@@ -55,7 +56,8 @@ const updateContribution = async (request: Request, response: Response) => {
         const meta = metadata[i];
         await Resource.create({
           contributionId: contribution._id,
-          subModuleId: meta.subModuleId,
+          subModuleOrModuleId: meta.subModuleOrModuleId,
+          subModuleOrModuleType: meta.subModuleOrModuleType,
           resourceType: meta.resourceType,
           publicId: data.public_id,
           file_url: data.secure_url,

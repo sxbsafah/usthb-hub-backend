@@ -6,8 +6,6 @@ import SubModule from "@/models/subModule";
 import Contribution from "@/models/contribution";
 import Resource from "@/models/resource";
 
-
-
 export const emailValidator = body("email")
   .isString()
   .notEmpty()
@@ -53,7 +51,6 @@ export const loginEmailValidator = body("email")
   .withMessage("Email is Required")
   .isEmail()
   .withMessage("Invalid email address");
-
 
 export const loginPasswordValidator = body("password")
   .isString()
@@ -191,15 +188,13 @@ export const moduleIdRouteValidator = param("id")
     }
   });
 
-export const subModuleIdRouteValidator = param("id")
+export const subModuleOrModuleIdValidator = param("id")
   .isMongoId()
-  .withMessage("Invalid SubModule ID")
-  .custom(async (value: string) => {
-    const existingSubModule = await SubModule.findById(value);
-    if (!existingSubModule) {
-      throw new Error("SubModule with the given ID does not exist");
-    }
-  });
+  .withMessage("Invalid ID");
+
+export const subModuleOrModuleTypeValidator = body("subModuleOrModuleType")
+  .isIn(["SubModule", "Module"])
+  .withMessage("Invalid type, must be 'SubModule' or 'Module'");
 
 export const contributionDescriptionValidator = body("description")
   .isString()

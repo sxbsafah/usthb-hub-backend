@@ -1,6 +1,7 @@
 import { Router } from "express";
 import createFaculty from "@/controllers/createFaculty";
 import getFaculties from "@/controllers/getFaculties";
+import getFacultiesWithModulesAndResources from "@/controllers/getFacultiesWithModulesAndResources";
 import getFacultyById from "@/controllers/getFacultyById";
 import updateFaculty from "@/controllers/updateFaculty";
 import deleteFaculty from "@/controllers/deleteFaculty";
@@ -12,6 +13,9 @@ import {
 } from "@/validators/validators";
 
 const router = Router();
+
+// GET /faculties/deep - Get all faculties with modules, submodules, resources, and contributions
+router.get("/deep", getFacultiesWithModulesAndResources);
 
 router.get("/", getFaculties);
 

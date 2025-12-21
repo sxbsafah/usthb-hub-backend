@@ -11,14 +11,10 @@ const metadataSchema = z.array(
       ["td", "tp", "exam", "course_material"],
       "Invalid resource type"
     ),
-    subModuleId: z.string().refine(
-      async (value: string) => {
-        return !!(await SubModule.findById(value));
-      },
-      { error: "Invalid SubModuleId" }
-    ),
+    subModuleOrModuleId: z.string(),
+    subModuleOrModuleType: z.enum(["SubModule", "Module"], "Invalid type"),
   }),
-  "metadata must be an array of objects with resourceType and valid subModuleId"
+  "metadata must be an array of objects with resourceType, subModuleOrModuleId, and subModuleOrModuleType"
 );
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;

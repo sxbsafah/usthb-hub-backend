@@ -11,7 +11,7 @@ import {
   moduleIdValidator,
   subModuleNameValidator,
   moduleIdParamRouteValidator,
-  subModuleIdRouteValidator,
+  subModuleOrModuleIdValidator,
 } from "@/validators/validators";
 
 const router = Router();
@@ -27,7 +27,7 @@ router.get(
 
 router.get(
   "/:id",
-  subModuleIdRouteValidator,
+  subModuleOrModuleIdValidator,
   validateRequest,
   getSubModuleById
 );
@@ -44,7 +44,7 @@ router.post(
 router.put(
   "/:id",
   authenticate("admin"),
-  subModuleIdRouteValidator,
+  subModuleOrModuleIdValidator,
   validateRequest,
   updateSubModule
 );
@@ -52,7 +52,7 @@ router.put(
 router.delete(
   "/:id",
   authenticate("admin"),
-  subModuleIdRouteValidator,
+  subModuleOrModuleIdValidator,
   validateRequest,
   deleteSubModule
 );

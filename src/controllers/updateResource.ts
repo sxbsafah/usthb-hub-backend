@@ -34,7 +34,8 @@ const updateResource = async (request: Request, response: Response) => {
       });
     }
 
-    const { resourceType, subModuleId } = request.body;
+    const { resourceType, subModuleOrModuleId, subModuleOrModuleType } =
+      request.body;
 
     resource.file_url = request.resources[0].secure_url;
     resource.publicId = request.resources[0].public_id;
@@ -42,8 +43,11 @@ const updateResource = async (request: Request, response: Response) => {
     if (resourceType) {
       resource.resourceType = resourceType;
     }
-    if (subModuleId) {
-      resource.subModuleId = subModuleId;
+    if (subModuleOrModuleId) {
+      resource.subModuleOrModuleId = subModuleOrModuleId;
+    }
+    if (subModuleOrModuleType) {
+      resource.subModuleOrModuleType = subModuleOrModuleType;
     }
     await resource.save();
 

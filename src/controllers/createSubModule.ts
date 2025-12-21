@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import SubModule, { ISubModule } from "@/models/subModule";
 
-
 type SubModuleData = Pick<ISubModule, "name" | "moduleId">;
-
 
 const createSubModule = async (request: Request, response: Response) => {
   try {
@@ -13,17 +11,18 @@ const createSubModule = async (request: Request, response: Response) => {
       message: "SubModule created successfully",
       subModule: {
         name: name,
-        subModuleId: subModule._id,
+        subModuleOrModuleId: subModule._id,
+        subModuleOrModuleType: "SubModule",
         moduleId: moduleId,
-      }
-    })
+      },
+    });
   } catch (error) {
     return response.status(500).json({
       code: "InternalServerError",
       message: "InternalServerError occured, please try again later",
       err: error,
-    })
+    });
   }
-}
+};
 
 export default createSubModule;
