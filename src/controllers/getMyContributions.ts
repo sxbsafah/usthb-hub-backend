@@ -21,9 +21,48 @@ const getMyContributions = async (request: Request, response: Response) => {
         const resources = await Resource.find({
           contributionId: contribution._id,
         }).populate("subModuleOrModuleId", "name");
+
+        // Fallback: if subModuleOrModuleId is null, fetch manually
+        const resourcesWithNames = await Promise.all(
+          resources.map(async (resource) => {
+            let subModuleOrModuleName = null;
+            if (
+              !resource.subModuleOrModuleId &&
+              resource.subModuleOrModuleType &&
+              resource.subModuleOrModuleId
+            ) {
+              // Defensive: should not happen, but just in case
+              return resource;
+            }
+            if (!resource.subModuleOrModuleId) {
+              // Try to fetch manually
+              if (resource.subModuleOrModuleType === "Module") {
+                const module = await require("@/models/module")
+                  .default.findById(resource.subModuleOrModuleId)
+                  .select("name");
+                subModuleOrModuleName = module ? module.name : null;
+              } else if (resource.subModuleOrModuleType === "SubModule") {
+                const subModule = await require("@/models/subModule")
+                  .default.findById(resource.subModuleOrModuleId)
+                  .select("name");
+                subModuleOrModuleName = subModule ? subModule.name : null;
+              }
+            } else if (
+              resource.subModuleOrModuleId &&
+              typeof resource.subModuleOrModuleId === "object" &&
+              resource.subModuleOrModuleId.name
+            ) {
+              subModuleOrModuleName = resource.subModuleOrModuleId.name;
+            }
+            return {
+              ...resource.toObject(),
+              subModuleOrModuleName,
+            };
+          })
+        );
         return {
           ...(await contribution.populate("userId")).toObject(),
-          resources: resources,
+          resources: resourcesWithNames,
         };
       })
     );

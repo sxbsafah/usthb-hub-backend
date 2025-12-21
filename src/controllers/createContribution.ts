@@ -21,6 +21,7 @@ const createContribution = async (request: Request, response: Response) => {
 
     for (const [index, data] of metadata.entries()) {
       if (request.resources && request.resources[index]) {
+        console.log("Creating resource with data:", data);
         await Resource.create({
           contributionId: contribution._id,
           subModuleOrModuleId: new mongoose.Types.ObjectId(
