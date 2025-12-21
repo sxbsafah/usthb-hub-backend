@@ -4,6 +4,7 @@ import Resource from "@/models/resource";
 import mongoose from "mongoose";
 
 type MetadataEntry = {
+  resourceId?: string;
   subModuleOrModuleId: string;
   subModuleOrModuleType: "SubModule" | "Module";
   resourceType: "td" | "tp" | "exam" | "course_material";
@@ -47,17 +48,36 @@ const updateContribution = async (request: Request, response: Response) => {
       for (let i = 0; i < uploaded.length; i++) {
         const data = uploaded[i];
         const meta = metadata[i];
-        await Resource.create({
-          contributionId: contribution._id,
-          subModuleOrModuleId: new mongoose.Types.ObjectId(
-            meta.subModuleOrModuleId
-          ),
-          subModuleOrModuleType: meta.subModuleOrModuleType,
-          resourceType: meta.resourceType,
-          publicId: data.public_id,
-          file_url: data.secure_url,
-          status: "pending",
-        });
+        if (meta.resourceId) {
+          // Update existing resource
+          await Resource.findByIdAndUpdate(
+            meta.resourceId,
+            {
+              subModuleOrModuleId: new mongoose.Types.ObjectId(
+                meta.subModuleOrModuleId
+              ),
+              subModuleOrModuleType: meta.subModuleOrModuleType,
+              resourceType: meta.resourceType,
+              publicId: data.public_id,
+              file_url: data.secure_url,
+              status: "pending",
+            },
+            { new: true }
+          );
+        } else {
+          // Create new resource
+          await Resource.create({
+            contributionId: contribution._id,
+            subModuleOrModuleId: new mongoose.Types.ObjectId(
+              meta.subModuleOrModuleId
+            ),
+            subModuleOrModuleType: meta.subModuleOrModuleType,
+            resourceType: meta.resourceType,
+            publicId: data.public_id,
+            file_url: data.secure_url,
+            status: "pending",
+          });
+        }
       }
     }
 

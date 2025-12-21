@@ -11,8 +11,7 @@ const createSubModule = async (request: Request, response: Response) => {
       message: "SubModule created successfully",
       subModule: {
         name: name,
-        subModuleOrModuleId: subModule._id,
-        subModuleOrModuleType: "SubModule",
+        subModuleId: subModule._id,
         moduleId: moduleId,
       },
     });

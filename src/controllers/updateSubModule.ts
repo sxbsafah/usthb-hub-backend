@@ -45,8 +45,7 @@ const updateSubModule = async (request: Request, response: Response) => {
     return response.status(200).json({
       message: "SubModule updated successfully",
       subModule: {
-        subModuleOrModuleId: subModule._id,
-        subModuleOrModuleType: "SubModule",
+        subModuleId: subModule._id,
         name: subModule.name,
         moduleId: subModule.moduleId,
       },
