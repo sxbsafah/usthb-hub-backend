@@ -35,16 +35,8 @@ const updateContribution = async (request: Request, response: Response) => {
 
     const uploaded = request.resources || [];
     if (uploaded.length > 0) {
-      const metadataRaw = (request.body as { metadata?: string }).metadata;
-      if (!metadataRaw) {
-        return response.status(400).json({
-          code: "ValidationError",
-          message: "Metadata is required when uploading files",
-        });
-      }
-
-      const metadata: MetadataEntry[] = JSON.parse(metadataRaw);
-      if (metadata.length !== uploaded.length) {
+      const metadata: MetadataEntry[] = request.body.metadata;
+      if (!metadata || metadata.length !== uploaded.length) {
         return response.status(400).json({
           code: "ValidationError",
           message: "Metadata count does not match uploaded files count",

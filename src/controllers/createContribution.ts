@@ -3,14 +3,15 @@ import Contribution, { IContribution } from "@/models/contribution";
 import Resource, { IResource } from "@/models/resource";
 
 type ContributionData = Pick<IContribution, "description"> &
-  Pick<IResource, "subModuleOrModuleId" | "subModuleOrModuleType" | "resourceType">;
+  Pick<
+    IResource,
+    "subModuleOrModuleId" | "subModuleOrModuleType" | "resourceType"
+  >;
 
 const createContribution = async (request: Request, response: Response) => {
   try {
     const { description } = request.body as { description: string };
-    const metadata = JSON.parse(
-      (request.body as { metadata: string }).metadata
-    ) as ContributionData[];
+    const metadata = request.body.metadata as ContributionData[];
 
     const contribution = await Contribution.create({
       description: description,
