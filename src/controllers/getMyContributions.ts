@@ -14,7 +14,7 @@ const getMyContributions = async (request: Request, response: Response) => {
       contributions.map(async (contribution) => {
         const resources = await Resource.find({
           contributionId: contribution._id,
-        }).populate("subModuleId", "name");
+        }).populate("subModuleOrModuleId", "name");
 
         return {
           ...(await contribution.populate("userId")).toObject(),

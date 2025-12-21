@@ -3,7 +3,7 @@ import Contribution, { IContribution } from "@/models/contribution";
 import Resource, { IResource } from "@/models/resource";
 
 type ContributionData = Pick<IContribution, "description"> &
-  Pick<IResource, "subModuleId" | "resourceType">;
+  Pick<IResource, "subModuleOrModuleId" | "subModuleOrModuleType" | "resourceType">;
 
 const createContribution = async (request: Request, response: Response) => {
   try {
@@ -21,7 +21,8 @@ const createContribution = async (request: Request, response: Response) => {
       if (request.resources && request.resources[index]) {
         await Resource.create({
           contributionId: contribution._id,
-          subModuleId: data.subModuleId,
+          subModuleOrModuleId: data.subModuleOrModuleId,
+          subModuleOrModuleType: data.subModuleOrModuleType,
           resourceType: data.resourceType,
           publicId: request.resources[index].public_id,
           file_url: request.resources[index].secure_url,

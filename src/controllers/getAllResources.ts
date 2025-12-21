@@ -5,7 +5,7 @@ const getAllResources = async (request: Request, response: Response) => {
   try {
     const resources = await Resource.find()
       .populate("contributionId", "description")
-      .populate("subModuleId", "name");
+      .populate("subModuleOrModuleId", "name");
 
     return response.status(200).json({
       message: "Resources retrieved successfully",

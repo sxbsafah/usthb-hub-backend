@@ -9,7 +9,7 @@ const getPendingContributions = async (
   try {
     const pendingResources = await Resource.find({ status: "pending" })
       .populate("contributionId")
-      .populate("subModuleId", "name");
+      .populate("subModuleOrModuleId", "name");
 
     const contributionsMap = new Map();
 

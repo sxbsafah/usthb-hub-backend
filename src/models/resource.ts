@@ -1,15 +1,14 @@
 import mongoose from "mongoose";
 
-
 export interface IResource {
   contributionId: mongoose.Types.ObjectId;
   file_url: string;
   publicId: string;
   status: "approved" | "pending" | "rejected";
-  subModuleId: mongoose.Types.ObjectId;
+  subModuleOrModuleId: mongoose.Types.ObjectId;
   resourceType: "td" | "tp" | "exam" | "course_material";
+  subModuleOrModuleType: "SubModule" | "Module";
 }
-
 
 const resourceSchema = new mongoose.Schema<IResource>({
   contributionId: {
@@ -36,20 +35,25 @@ const resourceSchema = new mongoose.Schema<IResource>({
     default: "pending",
     required: [true, "Status is required"],
   },
-  subModuleId: {
+  subModuleOrModuleId: {
     type: mongoose.Schema.Types.ObjectId,
     required: [true, "SubModule ID is required"],
-    ref: "SubModule",
+    ref: "subModuleOrModuleType",
+  },
+  subModuleOrModuleType: {
+    type: String,
+    required: true,
+    enum: ["SubModule", "Module"], // allowed references
   },
   resourceType: {
     type: mongoose.Schema.Types.String,
     enum: {
       values: ["td", "tp", "exam", "course_material"],
-      message: "Resource type must be either 'td', 'tp', 'exam', or 'course_material'",
+      message:
+        "Resource type must be either 'td', 'tp', 'exam', or 'course_material'",
     },
     required: [true, "Resource type is required"],
   },
-})
-
+});
 
 export default mongoose.model<IResource>("Resource", resourceSchema);

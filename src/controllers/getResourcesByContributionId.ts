@@ -18,7 +18,7 @@ const getResourcesByContributionId = async (
     }
 
     const resources = await Resource.find({ contributionId: contributionId })
-      .populate("subModuleId", "name")
+      .populate("subModuleOrModuleId", "name")
       .sort({ createdAt: -1 });
 
     return response.status(200).json({

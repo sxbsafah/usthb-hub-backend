@@ -20,7 +20,7 @@ const getResourcesByUserId = async (request: Request, response: Response) => {
         match: { userId: userId },
         select: "description userId",
       })
-      .populate("subModuleId", "name")
+      .populate("subModuleOrModuleId", "name")
       .sort({ createdAt: -1 });
 
     const userResources = resources.filter(
