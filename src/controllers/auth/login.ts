@@ -37,7 +37,6 @@ const login = async (request: Request, response: Response) => {
       message: "Login successful",
       user: {
         token: token.token,
-        username: user.username,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
