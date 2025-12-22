@@ -13,7 +13,6 @@ const getContributions = async (req: Request, response: Response) => {
           contributionId: contribution._id,
         }).populate({
           path: "subModuleOrModuleId",
-          populate: { path: "moduleId" },
         });
         return {
           ...contribution.toObject(),

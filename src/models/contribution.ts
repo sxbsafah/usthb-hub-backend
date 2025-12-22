@@ -17,7 +17,7 @@ const contributionSchema = new mongoose.Schema<IContribution>({
     maxLength: [500, "Description must be at most 500 characters long"],
     minLength: [10, "Description must be at least 10 characters long"],
   }
-});
+}, { timestamps: true });
 
 
 export default mongoose.model<IContribution>("Contribution", contributionSchema);
