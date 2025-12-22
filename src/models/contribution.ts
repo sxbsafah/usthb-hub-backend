@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 export interface IContribution {
   userId: mongoose.Types.ObjectId;
   description: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const contributionSchema = new mongoose.Schema<IContribution>({

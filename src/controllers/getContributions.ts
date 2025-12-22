@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
 import Contribution from "@/models/contribution";
 import Resource from "@/models/resource";
+import Module from "@/models/module";
+import SubModule from "@/models/subModule";
+import { getFacultyNameById } from "@/lib/facultyName";
 
 const getContributions = async (req: Request, response: Response) => {
   try {
@@ -14,9 +17,52 @@ const getContributions = async (req: Request, response: Response) => {
         }).populate({
           path: "subModuleOrModuleId",
         });
+        // Replace facultyId with faculty name in each resource
+        const resourcesWithFacultyName = await Promise.all(
+          resources.map(async (resource) => {
+            let facultyName = null;
+            if (
+              resource.subModuleOrModuleType === "Module" &&
+              resource.subModuleOrModuleId
+            ) {
+              const module = await Module.findById(
+                resource.subModuleOrModuleId
+              ).select("facultyId");
+              facultyName =
+                module && module.facultyId
+                  ? await getFacultyNameById(module.facultyId)
+                  : null;
+            } else if (
+              resource.subModuleOrModuleType === "SubModule" &&
+              resource.subModuleOrModuleId
+            ) {
+              const subModule = await SubModule.findById(
+                resource.subModuleOrModuleId
+              ).select("moduleId");
+              if (subModule && subModule.moduleId) {
+                const module = await Module.findById(subModule.moduleId).select(
+                  "facultyId"
+                );
+                facultyName =
+                  module && module.facultyId
+                    ? await getFacultyNameById(module.facultyId)
+                    : null;
+              }
+            }
+            return {
+              ...resource.toObject(),
+              facultyName,
+            };
+          })
+        );
+        const cObj = contribution.toObject();
         return {
-          ...contribution.toObject(),
-          resources,
+          _id: cObj._id,
+          userId: cObj.userId,
+          description: cObj.description,
+          createdAt: cObj.createdAt,
+          updatedAt: cObj.updatedAt,
+          resources: resourcesWithFacultyName,
         };
       })
     );
