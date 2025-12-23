@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Module from "@/models/module";
+import SubModule from "@/models/subModule";
 
 const getModulesByFacultyId = async (request: Request, response: Response) => {
   try {
@@ -19,7 +20,10 @@ const getModulesByFacultyId = async (request: Request, response: Response) => {
 
     return response.status(200).json({
       message: "Modules retrieved successfully",
-      modules: modules,
+      modules: await Promise.all(modules.map(async module => ({
+        ...module,
+        doesHeHaveSubModules: await SubModule.exists({ moduleId: module._id }) ? true : false,
+      }))),
     });
   } catch (error) {
     return response.status(500).json({
