@@ -22,11 +22,19 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUserInfo = async (req: Request, res: Response) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const { firstName, lastName } = req.body;
+    if (!firstName || !lastName) {
+      return res
+        .status(400)
+        .json({ error: "Both firstName and lastName are required" });
+    }
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { firstName, lastName },
+      { new: true }
+    );
     if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
   } catch (error) {
@@ -44,8 +52,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-
-export const getCurretUser = async (req: Request, res: Response)=> {
+export const getCurretUser = async (req: Request, res: Response) => {
   const { userId } = req;
   try {
     const user = await User.findById(userId);
@@ -56,4 +63,4 @@ export const getCurretUser = async (req: Request, res: Response)=> {
   } catch (error) {
     res.status(500).json({ error: error });
   }
-}
+};
