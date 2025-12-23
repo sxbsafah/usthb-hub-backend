@@ -6,7 +6,7 @@ const getModulesByFacultyId = async (request: Request, response: Response) => {
   try {
     const { facultyId } = request.params;
 
-    const modules = await Module.find({ facultyId }).populate(
+    const modules = await Module.find({ facultyId }).lean().populate(
       "facultyId",
       "name"
     );
@@ -17,13 +17,16 @@ const getModulesByFacultyId = async (request: Request, response: Response) => {
         message: "No modules found for this faculty",
       });
     }
-
     return response.status(200).json({
       message: "Modules retrieved successfully",
-      modules: await Promise.all(modules.map(async module => ({
-        ...module,
-        doesHeHaveSubModules: await SubModule.exists({ moduleId: module._id }) ? true : false,
-      }))),
+      modules: await Promise.all(
+        modules.map(async (module) => ({
+          ...module,
+          doesHeHaveSubModules: !!(await SubModule.exists({
+            moduleId: module._id,
+          })),
+        }))
+      ),
     });
   } catch (error) {
     return response.status(500).json({
