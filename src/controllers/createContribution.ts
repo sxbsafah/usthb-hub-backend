@@ -4,7 +4,7 @@ import Resource, { IResource } from "@/models/resource";
 import mongoose from "mongoose";
 
 type ContributionData = Pick<IContribution, "description"> &
-  Pick<
+  Pick
     IResource,
     "subModuleOrModuleId" | "subModuleOrModuleType" | "resourceType"
   >;
@@ -14,6 +14,8 @@ const createContribution = async (request: Request, response: Response) => {
     const { description } = request.body as { description: string };
     const metadata = request.body.metadata as ContributionData[];
 
+    console.log("📦 Received metadata:", JSON.stringify(metadata, null, 2));
+
     const contribution = await Contribution.create({
       description: description,
       userId: request.userId,
@@ -22,24 +24,39 @@ const createContribution = async (request: Request, response: Response) => {
     for (const [index, data] of metadata.entries()) {
       if (request.resources && request.resources[index]) {
         console.log("Creating resource with data:", data);
-        await Resource.create({
+        console.log("subModuleOrModuleId type:", typeof data.subModuleOrModuleId);
+        console.log("subModuleOrModuleId value:", data.subModuleOrModuleId);
+
+        // Validate ObjectId
+        if (!mongoose.Types.ObjectId.isValid(data.subModuleOrModuleId)) {
+          console.error("❌ Invalid ObjectId:", data.subModuleOrModuleId);
+          throw new Error(`Invalid subModuleOrModuleId: ${data.subModuleOrModuleId}`);
+        }
+
+        const resourceData = {
           contributionId: contribution._id,
-          subModuleOrModuleId: new mongoose.Types.ObjectId(
-            data.subModuleOrModuleId
-          ),
+          subModuleOrModuleId: data.subModuleOrModuleId, // Don't convert, let Mongoose handle it
           subModuleOrModuleType: data.subModuleOrModuleType,
           resourceType: data.resourceType,
           publicId: request.resources[index].public_id,
           file_url: request.resources[index].secure_url,
-        });
+        };
+
+        console.log("💾 Creating resource with:", resourceData);
+
+        const createdResource = await Resource.create(resourceData);
+        
+        console.log("✅ Resource created:", createdResource);
       }
     }
+
     return response.status(201).json({
       code: "Success",
       message: "Contribution created successfully",
       data: await contribution.populate("userId"),
     });
   } catch (error) {
+    console.error("❌ Error in createContribution:", error);
     return response.status(500).json({
       code: "InternalServerError",
       message: "InternalServerError occured, please try again later",
