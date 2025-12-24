@@ -16,49 +16,88 @@ const getContributions = async (req: Request, response: Response) => {
           contributionId: contribution._id,
         });
 
+        console.log("=== RESOURCES FOR CONTRIBUTION ===");
+        console.log("Contribution ID:", contribution._id);
+        console.log("Number of resources:", resources.length);
+
         // Manually populate and get faculty name for each resource
         const resourcesWithFacultyName = await Promise.all(
           resources.map(async (resource) => {
+            console.log("\n--- Processing Resource ---");
+            console.log("Resource ID:", resource._id);
+            console.log("subModuleOrModuleId:", resource.subModuleOrModuleId);
+            console.log("subModuleOrModuleType:", resource.subModuleOrModuleType);
+            console.log("Type of subModuleOrModuleId:", typeof resource.subModuleOrModuleId);
+            
             let facultyName = null;
             let populatedSubModuleOrModule = null;
 
-            if (resource.subModuleOrModuleId) {
-              if (resource.subModuleOrModuleType === "Module") {
-                // Fetch the module
-                const module = await Module.findById(
-                  resource.subModuleOrModuleId
-                );
+            if (!resource.subModuleOrModuleId) {
+              console.log("❌ subModuleOrModuleId is null/undefined");
+              const resourceObj = resource.toObject();
+              return {
+                ...resourceObj,
+                subModuleOrModuleId: null,
+                facultyName: null,
+              };
+            }
 
-                if (module) {
-                  populatedSubModuleOrModule = module.toObject();
-
-                  if (module.facultyId) {
-                    facultyName = await getFacultyNameById(module.facultyId);
-                  }
-                }
-              } else if (resource.subModuleOrModuleType === "SubModule") {
-                // Fetch the submodule
-                const subModule = await SubModule.findById(
-                  resource.subModuleOrModuleId
-                );
-
-                if (subModule) {
-                  populatedSubModuleOrModule = subModule.toObject();
-
-                  // Fetch the parent module to get facultyId
-                  if (subModule.moduleId) {
-                    const module = await Module.findById(subModule.moduleId);
-
-                    if (module && module.facultyId) {
-                      facultyName = await getFacultyNameById(module.facultyId);
-                    }
-                  }
+            if (resource.subModuleOrModuleType === "Module") {
+              console.log("🔍 Fetching Module with ID:", resource.subModuleOrModuleId);
+              
+              const module = await Module.findById(resource.subModuleOrModuleId);
+              
+              console.log("Module found:", module ? "YES" : "NO");
+              if (module) {
+                console.log("Module data:", JSON.stringify(module, null, 2));
+                populatedSubModuleOrModule = module.toObject();
+                
+                if (module.facultyId) {
+                  console.log("Faculty ID:", module.facultyId);
+                  facultyName = await getFacultyNameById(module.facultyId);
+                  console.log("Faculty name:", facultyName);
+                } else {
+                  console.log("❌ No facultyId in module");
                 }
               }
+            } else if (resource.subModuleOrModuleType === "SubModule") {
+              console.log("🔍 Fetching SubModule with ID:", resource.subModuleOrModuleId);
+              
+              const subModule = await SubModule.findById(resource.subModuleOrModuleId);
+              
+              console.log("SubModule found:", subModule ? "YES" : "NO");
+              if (subModule) {
+                console.log("SubModule data:", JSON.stringify(subModule, null, 2));
+                populatedSubModuleOrModule = subModule.toObject();
+                
+                if (subModule.moduleId) {
+                  console.log("Parent module ID:", subModule.moduleId);
+                  const module = await Module.findById(subModule.moduleId);
+                  
+                  console.log("Parent module found:", module ? "YES" : "NO");
+                  if (module) {
+                    console.log("Parent module data:", JSON.stringify(module, null, 2));
+                    if (module.facultyId) {
+                      console.log("Faculty ID:", module.facultyId);
+                      facultyName = await getFacultyNameById(module.facultyId);
+                      console.log("Faculty name:", facultyName);
+                    } else {
+                      console.log("❌ No facultyId in parent module");
+                    }
+                  }
+                } else {
+                  console.log("❌ No moduleId in subModule");
+                }
+              }
+            } else {
+              console.log("❌ Invalid subModuleOrModuleType:", resource.subModuleOrModuleType);
             }
 
             // Return resource with populated data
             const resourceObj = resource.toObject();
+            console.log("Final populated data:", populatedSubModuleOrModule ? "EXISTS" : "NULL");
+            console.log("Final faculty name:", facultyName);
+            
             return {
               ...resourceObj,
               subModuleOrModuleId: populatedSubModuleOrModule,
@@ -84,6 +123,7 @@ const getContributions = async (req: Request, response: Response) => {
       contributions: contributionsWithResources,
     });
   } catch (error) {
+    console.error("❌ ERROR in getContributions:", error);
     return response.status(500).json({
       code: "InternalServerError",
       message: "InternalServerError occured, please try again later",
