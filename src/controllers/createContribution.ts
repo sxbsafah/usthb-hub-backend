@@ -3,9 +3,7 @@ import Contribution, { IContribution } from "@/models/contribution";
 import Resource, { IResource } from "@/models/resource";
 import mongoose from "mongoose";
 
-type ContributionData = Pick<IContribution, "description"> &
-  Pick
-    IResource,
+type ContributionData = Pick<IContribution, "description"> & Pick<IResource,
     "subModuleOrModuleId" | "subModuleOrModuleType" | "resourceType"
   >;
 
