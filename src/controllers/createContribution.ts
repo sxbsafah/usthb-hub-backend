@@ -2,8 +2,12 @@ import type { Request, Response } from "express";
 import Contribution, { IContribution } from "@/models/contribution";
 import Resource, { IResource } from "@/models/resource";
 import mongoose from "mongoose";
+import Module from "@/models/module";
+import subModule from "@/models/subModule";
 
-type ContributionData = Pick<IContribution, "description"> & Pick<IResource,
+type ContributionData = Pick<IContribution, "description"> &
+  Pick<
+    IResource,
     "subModuleOrModuleId" | "subModuleOrModuleType" | "resourceType"
   >;
 
@@ -22,15 +26,30 @@ const createContribution = async (request: Request, response: Response) => {
     for (const [index, data] of metadata.entries()) {
       if (request.resources && request.resources[index]) {
         console.log("Creating resource with data:", data);
-        console.log("subModuleOrModuleId type:", typeof data.subModuleOrModuleId);
+        console.log(
+          "subModuleOrModuleId type:",
+          typeof data.subModuleOrModuleId
+        );
         console.log("subModuleOrModuleId value:", data.subModuleOrModuleId);
 
         // Validate ObjectId
         if (!mongoose.Types.ObjectId.isValid(data.subModuleOrModuleId)) {
           console.error("❌ Invalid ObjectId:", data.subModuleOrModuleId);
-          throw new Error(`Invalid subModuleOrModuleId: ${data.subModuleOrModuleId}`);
+          throw new Error(
+            `Invalid subModuleOrModuleId: ${data.subModuleOrModuleId}`
+          );
         }
-
+        if (
+          (metadata[index].subModuleOrModuleType === "Module" &&
+            (await Module.findById(data.subModuleOrModuleId)) === null) ||
+          (metadata[index].subModuleOrModuleType === "SubModule" &&
+            (await subModule.findById(data.subModuleOrModuleId)) === null)
+        ) {
+          return response.status(400).json({
+            code: "BadRequest",
+            message: `The provided subModuleOrModuleId does not exist in the specified type: ${data.subModuleOrModuleType}`,
+          });
+        }
         const resourceData = {
           contributionId: contribution._id,
           subModuleOrModuleId: data.subModuleOrModuleId, // Don't convert, let Mongoose handle it
@@ -43,7 +62,7 @@ const createContribution = async (request: Request, response: Response) => {
         console.log("💾 Creating resource with:", resourceData);
 
         const createdResource = await Resource.create(resourceData);
-        
+
         console.log("✅ Resource created:", createdResource);
       }
     }
