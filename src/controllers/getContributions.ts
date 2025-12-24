@@ -9,52 +9,59 @@ const getContributions = async (req: Request, response: Response) => {
   try {
     const contributions = await Contribution.find().populate("userId");
 
-    // For each contribution, fetch its resources and populate subModuleOrModuleId
+    // For each contribution, fetch its resources manually
     const contributionsWithResources = await Promise.all(
       contributions.map(async (contribution) => {
         const resources = await Resource.find({
           contributionId: contribution._id,
-        }).populate({
-          path: "subModuleOrModuleId",
         });
 
-        // Replace facultyId with faculty name in each resource
+        // Manually populate and get faculty name for each resource
         const resourcesWithFacultyName = await Promise.all(
           resources.map(async (resource) => {
             let facultyName = null;
+            let populatedSubModuleOrModule = null;
 
-            if (
-              resource.subModuleOrModuleType === "Module" &&
-              resource.subModuleOrModuleId
-            ) {
-              // subModuleOrModuleId is already populated, use it directly
-              const module = resource.subModuleOrModuleId as any;
-              
-              facultyName =
-                module && module.facultyId
-                  ? await getFacultyNameById(module.facultyId)
-                  : null;
-            } else if (
-              resource.subModuleOrModuleType === "SubModule" &&
-              resource.subModuleOrModuleId
-            ) {
-              // subModuleOrModuleId is already populated, use it directly
-              const subModule = resource.subModuleOrModuleId as any;
-
-              if (subModule && subModule.moduleId) {
-                const module = await Module.findById(subModule.moduleId).select(
-                  "facultyId"
+            if (resource.subModuleOrModuleId) {
+              if (resource.subModuleOrModuleType === "Module") {
+                // Fetch the module
+                const module = await Module.findById(
+                  resource.subModuleOrModuleId
                 );
 
-                facultyName =
-                  module && module.facultyId
-                    ? await getFacultyNameById(module.facultyId)
-                    : null;
+                if (module) {
+                  populatedSubModuleOrModule = module.toObject();
+
+                  if (module.facultyId) {
+                    facultyName = await getFacultyNameById(module.facultyId);
+                  }
+                }
+              } else if (resource.subModuleOrModuleType === "SubModule") {
+                // Fetch the submodule
+                const subModule = await SubModule.findById(
+                  resource.subModuleOrModuleId
+                );
+
+                if (subModule) {
+                  populatedSubModuleOrModule = subModule.toObject();
+
+                  // Fetch the parent module to get facultyId
+                  if (subModule.moduleId) {
+                    const module = await Module.findById(subModule.moduleId);
+
+                    if (module && module.facultyId) {
+                      facultyName = await getFacultyNameById(module.facultyId);
+                    }
+                  }
+                }
               }
             }
 
+            // Return resource with populated data
+            const resourceObj = resource.toObject();
             return {
-              ...resource.toObject(),
+              ...resourceObj,
+              subModuleOrModuleId: populatedSubModuleOrModule,
               facultyName,
             };
           })
