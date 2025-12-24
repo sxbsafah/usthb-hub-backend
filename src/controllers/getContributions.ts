@@ -17,17 +17,19 @@ const getContributions = async (req: Request, response: Response) => {
         }).populate({
           path: "subModuleOrModuleId",
         });
+
         // Replace facultyId with faculty name in each resource
         const resourcesWithFacultyName = await Promise.all(
           resources.map(async (resource) => {
             let facultyName = null;
+
             if (
               resource.subModuleOrModuleType === "Module" &&
               resource.subModuleOrModuleId
             ) {
-              const module = await Module.findById(
-                resource.subModuleOrModuleId
-              ).select("facultyId");
+              // subModuleOrModuleId is already populated, use it directly
+              const module = resource.subModuleOrModuleId as any;
+              
               facultyName =
                 module && module.facultyId
                   ? await getFacultyNameById(module.facultyId)
@@ -36,25 +38,28 @@ const getContributions = async (req: Request, response: Response) => {
               resource.subModuleOrModuleType === "SubModule" &&
               resource.subModuleOrModuleId
             ) {
-              const subModule = await SubModule.findById(
-                resource.subModuleOrModuleId
-              ).select("moduleId");
+              // subModuleOrModuleId is already populated, use it directly
+              const subModule = resource.subModuleOrModuleId as any;
+
               if (subModule && subModule.moduleId) {
                 const module = await Module.findById(subModule.moduleId).select(
                   "facultyId"
                 );
+
                 facultyName =
                   module && module.facultyId
                     ? await getFacultyNameById(module.facultyId)
                     : null;
               }
             }
+
             return {
               ...resource.toObject(),
               facultyName,
             };
           })
         );
+
         const cObj = contribution.toObject();
         return {
           _id: cObj._id,
