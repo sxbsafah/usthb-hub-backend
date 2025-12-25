@@ -5,6 +5,7 @@ import modulesRouter from "@/routes/modules";
 import subModulesRouter from "@/routes/subModules";
 import contributionsRouter from "@/routes/contributions";
 import usersRouter from "@/routes/users";
+import resourcesRouter from "@/routes/resources";
 
 const router = Router();
 
@@ -14,6 +15,7 @@ router.use("/modules", modulesRouter);
 router.use("/submodules", subModulesRouter);
 router.use("/contributions", contributionsRouter);
 router.use("/users", usersRouter);
+router.use("/resources", resourcesRouter);
 
 router.get("/", (request, response) => {
   return response.json({
