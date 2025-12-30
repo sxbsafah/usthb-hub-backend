@@ -33,8 +33,10 @@ const getFacultiesWithModulesAndResources = async (
             const contribution = await Contribution.findById(
               resource.contributionId
             );
+            const obj = resource.toObject();
+            delete (obj as any).subModuleOrModuleId;
             return {
-              ...resource.toObject(),
+              ...obj,
               contribution,
               facultyName: moduleFacultyName,
             };
@@ -57,8 +59,10 @@ const getFacultiesWithModulesAndResources = async (
                 const contribution = await Contribution.findById(
                   resource.contributionId
                 );
+                const obj = resource.toObject();
+                delete (obj as any).subModuleOrModuleId;
                 return {
-                  ...resource.toObject(),
+                  ...obj,
                   contribution,
                   facultyName: subModuleFacultyName,
                 };
