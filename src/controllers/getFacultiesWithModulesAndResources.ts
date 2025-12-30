@@ -19,6 +19,7 @@ const getFacultiesWithModulesAndResources = async (
       for (const module of modules) {
         // Get submodules for this module
         const subModules = await SubModule.find({ moduleId: module._id });
+        const doesHeHaveSubModules = subModules.length > 0;
         // Get only accepted resources linked to this module
         const moduleResources = await Resource.find({
           subModuleOrModuleId: module._id,
@@ -73,6 +74,7 @@ const getFacultiesWithModulesAndResources = async (
           ...module.toObject(),
           resources: moduleResourcesWithContributions,
           subModules: subModulesWithResources,
+          doesHeHaveSubModules,
         });
       }
       result.push({
